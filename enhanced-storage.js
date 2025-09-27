@@ -1,12 +1,12 @@
-// Enhanced Storage System for Wordle: Bean Edition
+// Enhanced Storage System for Wordle: Mom Edition
 // This provides comprehensive game tracking across browser sessions
 
 const STORAGE_KEYS = {
-    GAME_HISTORY: 'wordleBeanHistory',
-    DAILY_STATS: 'wordleBeanDailyStats', 
-    OVERALL_STATS: 'wordleBeanOverallStats',
-    STREAKS: 'wordleBeanStreaks',
-    CATEGORY_STATS: 'wordleBeanCategoryStats'
+    GAME_HISTORY: 'wordleMomHistory',
+    DAILY_STATS: 'wordleMomDailyStats', 
+    OVERALL_STATS: 'wordleMomOverallStats',
+    STREAKS: 'wordleMomStreaks',
+    CATEGORY_STATS: 'wordleMomCategoryStats'
 };
 
 class WordleStorage {
@@ -32,9 +32,9 @@ class WordleStorage {
 
         if (!this.getItem(STORAGE_KEYS.CATEGORY_STATS)) {
             this.setItem(STORAGE_KEYS.CATEGORY_STATS, {
-                BEAN: { played: 0, won: 0, percentage: 0 },
-                US: { played: 0, won: 0, percentage: 0 },
-                ENVIRONMENT: { played: 0, won: 0, percentage: 0 }
+                ENGLISH: { played: 0, won: 0, percentage: 0 },
+                TURKEY: { played: 0, won: 0, percentage: 0 },
+                NATURE: { played: 0, won: 0, percentage: 0 }
             });
         }
 

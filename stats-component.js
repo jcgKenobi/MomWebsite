@@ -1,5 +1,5 @@
-// Enhanced Statistics Component for Wordle: Bean Edition
-// This creates beautiful visualizations of Bean's game statistics
+// Enhanced Statistics Component for Wordle: Mom Edition
+// This creates beautiful visualizations of Mom's game statistics
 
 // Add this component to your WorldeForkImproved.html file
 
@@ -54,7 +54,7 @@ const StatsVisualizer = ({ storage }) => {
         <div className="stats-container space-y-6">
             {/* Header */}
             <div className="text-center">
-                <h2 className="text-3xl font-bold mb-4">Bean's Wordle Stats</h2>
+                <h2 className="text-3xl font-bold mb-4">Mom's Wordle Stats</h2>
                 <div className="flex justify-center space-x-2 mb-6">
                     {['all', 'week', 'month'].map((period) => (
                         <button
@@ -185,9 +185,9 @@ const GuessDistributionChart = ({ distribution, totalWins }) => {
 
 const CategoryRow = ({ category, stats }) => {
     const categoryNames = {
-        BEAN: '💕 Bean',
-        US: '👫 CJ&CJ', 
-        ENVIRONMENT: '🌍 Environment'
+        ENGLISH: '🇬🇧 English',
+        TURKEY: '🇹🇷 Türkiye', 
+        NATURE: '🌿 Doğa'
     };
 
     const percentage = stats.played > 0 ? stats.percentage : 0;

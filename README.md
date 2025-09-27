@@ -1,14 +1,14 @@
-# Mom's Anniversary Website 🎂❤️
+# Mom's Birthday Website 🎂❤️
 
-A special anniversary website with personalized games and content, featuring a custom **Wordle: Bean Edition** game.
+A special birthday website with personalized games and content, featuring a custom **Wordle: Mom Edition** game.
 
 ## 🌟 Features
 
 ### 🎮 Games
-- **[Wordle: Bean Edition](WorldeForkImproved.html)** - A fully customized Wordle game with:
-  - 💕 Bean-themed word bank
-  - 👫 Relationship word bank  
-  - 🌍 Environment word bank
+- **[Wordle: Mom Edition](WorldeForkImproved.html)** - A fully customized Wordle game with:
+  - 🇬🇧 English word bank (simple English words)
+  - 🇹🇷 Turkish word bank (Turkish words)
+  - 🌿 Nature word bank (Turkish nature words)
   - 📊 Complete statistics tracking
   - 🏆 Streak counting and achievements
   - 📱 Mobile-responsive design
@@ -30,18 +30,18 @@ Visit the website: [Your GitHub Pages URL]
 ## 📁 File Structure
 
 ```
-├── index.html                 # Main homepage with all games and sections
-├── WorldeForkImproved.html    # Advanced Wordle: Bean Edition game
+├── index.html                 # Main birthday website
+├── WorldeForkImproved.html    # Advanced Wordle: Mom Edition game
 ├── enhanced-storage.js        # Local storage system for game statistics
 ├── stats-component.js         # Statistics visualization components
 ├── WordleFork.html           # Original simple Wordle (backup)
 └── README.md                 # This file
 ```
 
-## 🎯 Wordle: Bean Edition Highlights
+## 🎯 Wordle: Mom Edition Highlights
 
 ### Game Features
-- **4 Game Modes**: Bean words, relationship words, environment words, and random mix
+- **3 Game Modes**: English words, Turkish words, nature words (Turkish), and random mix
 - **Smart Word Selection**: Prevents immediate repeats
 - **Turkish Character Support**: Full support for Ğ, Ü, Ş, İ, Ö, Ç
 - **Proper Wordle Logic**: Accurate keyboard coloring and game mechanics
@@ -75,8 +75,8 @@ Visit the website: [Your GitHub Pages URL]
 
 ## 💝 Personal Touch
 
-This website was created as a special anniversary gift with:
-- Personalized word banks reflecting shared memories
+This website was created as a special birthday gift with:
+- Personalized word banks in English and Turkish
 - Custom statistics to track progress over time
 - Beautiful, modern design with smooth animations
 - Mobile-first approach for playing anywhere, anytime
@@ -103,10 +103,11 @@ The website is fully optimized for mobile devices with:
 
 ## 🎨 Customization
 
-To customize the word banks in Wordle: Bean Edition:
+To customize the word banks in Wordle: Mom Edition:
 1. Edit the `WORD_BANKS` object in `WorldeForkImproved.html`
 2. Add or modify words in each category
-3. All words should be exactly 5 characters in Turkish
+3. English words should be exactly 5 characters
+4. Turkish words should be exactly 5 characters in Turkish
 
 ## 📊 Statistics Features
 
@@ -119,4 +120,4 @@ The enhanced statistics system tracks:
 
 ---
 
-Made with ❤️ for an amazing mom and partner. Happy Anniversary! 🎉
+Made with ❤️ for an amazing mom. Happy Birthday! 🎉

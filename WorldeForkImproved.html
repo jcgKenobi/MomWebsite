@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wordle - Bean Edition</title>
+    <title>Wordle - Mom Edition</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React Libraries -->
@@ -249,9 +249,9 @@
 
         // --- DATA & LOCALSTORAGE ---
         const WORD_BANKS = {
-            BEAN: ["GUZEL", "CANIM", "SENNA", "FOTOS", "KOMIK", "AKILLI", "NAZIK", "TATLI", "MELEK", "SEVGI", "KALBE", "OMRUM", "ASKIM", "BITANEM", "HAYAT"],
-            US: ["GELECEK", "BERABER", "SEYAHAT", "YEMEK", "FILM", "MUZIK", "EVLILIK", "MUTLU", "HUZUR", "DESTEK", "GUZEL", "YAKIN", "ORTAK", "PLAN", "ANI"],
-            ENVIRONMENT: ["AGAC", "ORMAN", "TOPRAK", "NEHIR", "HAVA", "DENIZ", "GOKYUZU", "YAGMUR", "BULUT", "GUNES", "YILDIZ", "GEZEGEN", "DOGA", "HAYVAN", "BITKI"],
+            ENGLISH: ["HAPPY", "HOUSE", "WATER", "HEART", "SMILE", "LIGHT", "PEACE", "DREAM", "MUSIC", "SWEET", "BREAD", "CLEAN", "FRESH", "LAUGH", "DANCE"],
+            TURKEY: ["GUZEL", "SEVGI", "MUTLU", "HUZUR", "YUVA", "AILEM", "KALBI", "OMRUM", "HAYAT", "GUVEN", "SABIR", "UMUT", "GURUR", "DESTEK", "YAKIN"],
+            NATURE: ["AGAC", "ORMAN", "TOPRAK", "NEHIR", "HAVA", "DENIZ", "GOKYUZU", "YAGMUR", "BULUT", "GUNES", "YILDIZ", "GEZEGEN", "DOGA", "HAYVAN", "BITKI"]
         };
 
         const useEnhancedStorage = () => {
@@ -276,9 +276,15 @@
 
         // --- UI COMPONENTS ---
         const MainMenu = ({ navigate }) => (
-            <div className="text-center">
-                <h1 className="font-poppins text-6xl font-bold tracking-tighter">WORDLE</h1>
-                <p className="text-xl font-semibold text-indigo-600 mb-12">Bean Edition</p>
+            <div className="text-center relative">
+                <button 
+                    onClick={() => window.location.href = 'index.html'} 
+                    className="absolute top-0 left-0 bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                    ← Back to Main Site
+                </button>
+                <h1 className="font-poppins text-6xl font-bold tracking-tighter mt-16">WORDLE</h1>
+                <p className="text-xl font-semibold text-indigo-600 mb-12">Mom Edition</p>
                 <button className="menu-button" onClick={() => navigate('MODE_SELECT')}>Play</button>
                 <button className="menu-button" onClick={() => navigate('LEADERBOARD')}>Leaderboard</button>
                 <button className="menu-button" onClick={() => navigate('STATISTICS')}>Statistics</button>
@@ -290,17 +296,17 @@
             <div>
                 <h2 className="text-3xl font-bold text-center mb-8">Select Mode</h2>
                 <div className="mode-selection-grid">
-                    <div className="mode-card" onClick={() => onSelectMode('BEAN')}>
-                        <div className="mode-image-placeholder">Bean Image</div>
-                        <h3>Bean</h3>
+                    <div className="mode-card" onClick={() => onSelectMode('ENGLISH')}>
+                        <div className="mode-image-placeholder">English 🇬🇧</div>
+                        <h3>English</h3>
                     </div>
-                    <div className="mode-card" onClick={() => onSelectMode('US')}>
-                        <div className="mode-image-placeholder">Us Image</div>
-                        <h3>CJ&CJ</h3>
+                    <div className="mode-card" onClick={() => onSelectMode('TURKEY')}>
+                        <div className="mode-image-placeholder">Turkey 🇹🇷</div>
+                        <h3>Türkiye</h3>
                     </div>
-                    <div className="mode-card" onClick={() => onSelectMode('ENVIRONMENT')}>
-                        <div className="mode-image-placeholder">Environment Image</div>
-                        <h3>Environment</h3>
+                    <div className="mode-card" onClick={() => onSelectMode('NATURE')}>
+                        <div className="mode-image-placeholder">Nature 🌿</div>
+                        <h3>Doğa</h3>
                     </div>
                 </div>
             </div>
@@ -537,7 +543,7 @@
             return (
                 <div className="space-y-6">
                     <div className="text-center">
-                        <h2 className="text-3xl font-bold mb-6">Bean's Wordle Statistics</h2>
+                    <h2 className="text-3xl font-bold mb-6">Mom's Wordle Statistics</h2>
                     </div>
 
                     {/* Main Stats Cards */}
@@ -625,9 +631,9 @@
                         <div className="space-y-3">
                             {Object.entries(categories).map(([category, categoryStats]) => {
                                 const categoryNames = {
-                                    BEAN: '💕 Bean',
-                                    US: '👫 CJ&CJ', 
-                                    ENVIRONMENT: '🌍 Environment'
+                                    ENGLISH: '🇬🇧 English',
+                                    TURKEY: '🇹🇷 Türkiye', 
+                                    NATURE: '🌿 Doğa'
                                 };
                                 const percentage = categoryStats.played > 0 ? categoryStats.percentage : 0;
                                 
