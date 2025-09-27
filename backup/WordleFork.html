@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Game</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React Libraries -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel to compile JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Styles for the Wordle Game */
+        .wordle-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .wordle-tile {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #d3d6da;
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #1a202c;
+            transition: all 0.3s ease;
+        }
+
+        .wordle-tile.correct {
+            background-color: #6aaa64;
+            color: white;
+            border-color: #6aaa64;
+        }
+
+        .wordle-tile.present {
+            background-color: #c9b458;
+            color: white;
+            border-color: #c9b458;
+        }
+
+        .wordle-tile.absent {
+            background-color: #787c7e;
+            color: white;
+            border-color: #787c7e;
+        }
+
+        .wordle-tile.filled {
+            border-color: #878a8c;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+
+        .key {
+            padding: 10px 15px;
+            margin: 2px;
+            border-radius: 4px;
+            background-color: #d3d6da;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .key:hover {
+            background-color: #b5b9bd;
+        }
+
+        .key.correct {
+            background-color: #6aaa64;
+            color: white;
+        }
+
+        .key.present {
+            background-color: #c9b458;
+            color: white;
+        }
+
+        .key.absent {
+            background-color: #787c7e;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useRef } = React;
+
+        // --- WORDLE GAME COMPONENTS ---
+        const EndGameScreen = ({ result, solution, onPlayAgain }) => {
+            return (
+                <div className="bg-white p-8 rounded-lg shadow-xl text-center max-w-md">
+                    <h2 className="text-4xl font-bold mb-4">
+                        {result === 'won' ? (
+                            <span className="text-green-600">Correct!</span>
+                        ) : (
+                            <span className="text-red-600">Wrong!</span>
+                        )}
+                    </h2>
+                    <p className="text-xl mb-2">The word was:</p>
+                    <p className="text-3xl font-bold text-gray-800 mb-6">{solution}</p>
+                    {result === 'won' ? (
+                        <p className="text-green-600 mb-6">Great job! You guessed it correctly!</p>
+                    ) : (
+                        <p className="text-red-600 mb-6">Better luck next time!</p>
+                    )}
+                    <button 
+                        onClick={onPlayAgain}
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                    >
+                        Play Again
+                    </button>
+                </div>
+            );
+        };
+
+        const WordleGame = () => {
+            const solution = "ERDAL";
+            const [guesses, setGuesses] = useState(Array(6).fill(null));
+            const [currentGuess, setCurrentGuess] = useState("");
+            const [isGameOver, setIsGameOver] = useState(false);
+            const [gameResult, setGameResult] = useState(null); // 'won' or 'lost'
+            const [keyStatuses, setKeyStatuses] = useState({});
+
+            const handleKeyPress = useCallback((key) => {
+                if (isGameOver) return;
+                if (key === "ENTER") {
+                    if (currentGuess.length !== 5) return;
+                    const newKeyStatuses = { ...keyStatuses };
+                    for (let i = 0; i < currentGuess.length; i++) {
+                        const char = currentGuess[i];
+                        let status;
+                        if (solution[i] === char) { status = 'correct'; }
+                        else if (solution.includes(char)) { status = 'present'; }
+                        else { status = 'absent'; }
+                        if (!newKeyStatuses[char] || status === 'correct') { newKeyStatuses[char] = status; }
+                        else if (newKeyStatuses[char] === 'present' && status === 'absent') { /* do nothing */ }
+                        else { newKeyStatuses[char] = status; }
+                    }
+                    setKeyStatuses(newKeyStatuses);
+                    const newGuesses = [...guesses];
+                    const currentGuessIndex = guesses.findIndex(g => g === null);
+                    newGuesses[currentGuessIndex] = currentGuess;
+                    setGuesses(newGuesses);
+                    setCurrentGuess("");
+                    if (currentGuess === solution) {
+                        setIsGameOver(true);
+                        setGameResult('won');
+                    } else if (currentGuessIndex === 5) {
+                        setIsGameOver(true);
+                        setGameResult('lost');
+                    }
+                    return;
+                }
+                if (key === "BACKSPACE") {
+                    setCurrentGuess(currentGuess.slice(0, -1));
+                    return;
+                }
+                if (currentGuess.length < 5 && /^[A-Z]$/.test(key)) {
+                    setCurrentGuess(currentGuess + key);
+                }
+            }, [currentGuess, isGameOver, guesses, solution, keyStatuses]);
+
+            useEffect(() => {
+                const handleKeyDown = (e) => handleKeyPress(e.key.toUpperCase());
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [handleKeyPress]);
+
+            const handlePlayAgain = () => {
+                setGuesses(Array(6).fill(null));
+                setCurrentGuess("");
+                setIsGameOver(false);
+                setGameResult(null);
+                setKeyStatuses({});
+            };
+
+            // Show end game screen if game is over
+            if (gameResult) {
+                return <EndGameScreen result={gameResult} solution={solution} onPlayAgain={handlePlayAgain} />;
+            }
+
+            return (
+                <div className="bg-white p-6 rounded-lg shadow-xl">
+                    <h1 className="text-3xl font-bold text-center mb-4">Wordle</h1>
+                    <div className="flex flex-col items-center">
+                        <WordleGrid guesses={guesses} currentGuess={currentGuess} solution={solution} />
+                        <Keyboard onKeyPress={handleKeyPress} keyStatuses={keyStatuses} />
+                    </div>
+                </div>
+            );
+        };
+
+        const WordleGrid = ({ guesses, currentGuess, solution }) => (
+            <div className="wordle-grid">
+                {guesses.map((guess, i) => {
+                    const isCurrentRow = i === guesses.findIndex(g => g === null);
+                    return <Row key={i} guess={isCurrentRow ? currentGuess : guess ?? ""} solution={solution} isSubmitted={!isCurrentRow && guess != null} />;
+                })}
+            </div>
+        );
+
+        const Row = ({ guess, solution, isSubmitted }) => {
+            const tiles = [];
+            for (let i = 0; i < 5; i++) {
+                const char = guess[i];
+                let className = "wordle-tile";
+                if (isSubmitted) {
+                    if (solution[i] === char) { className += " correct"; }
+                    else if (solution.includes(char)) { className += " present"; }
+                    else { className += " absent"; }
+                } else if (char) { className += " filled"; }
+                tiles.push(<div key={i} className={className}>{char}</div>);
+            }
+            return <>{tiles}</>;
+        };
+
+        const Keyboard = ({ onKeyPress, keyStatuses }) => {
+            const rows = ["QWERTYUIOP".split(""), "ASDFGHJKL".split(""), ["ENTER", ..."ZXCVBNM".split(""), "BACKSPACE"]];
+            return (
+                <div>
+                    {rows.map((row, i) => (
+                        <div key={i} className="keyboard-row">
+                            {row.map(key => {
+                                const status = keyStatuses[key];
+                                const keyClassName = `key ${status ? status : ''}`;
+                                return <button key={key} className={keyClassName} onClick={() => onKeyPress(key)}>{key}</button>;
+                            })}
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<WordleGame />);
+    </script>
+</body>
+
+</html>

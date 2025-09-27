@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Mom!</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React Libraries -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel to compile JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Crossword library -->
+    <script src="https://unpkg.com/@jaredreisinger/react-crossword@0.5.1/dist/index.umd.min.js"></script>
+    <!-- Google Fonts for Birthday Page -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
+
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .font-poppins {
+            font-family: 'Poppins', sans-serif;
+        }
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            grid-template-areas:
+                "games games lucky"
+                "photos music music";
+            gap: 1.5rem;
+            height: 90vh;
+            width: 90vw;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .games-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+            }
+        }
+
+        .card {
+            transform-style: preserve-3d;
+            transition: all 0.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            min-height: 200px;
+        }
+        .card:hover {
+            transform: perspective(1000px) rotateY(var(--rotate-y, 0)) rotateX(var(--rotate-x, 0)) scale3d(1.05, 1.05, 1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .card-content {
+             transform: translateZ(20px);
+        }
+        .central-card {
+            transition: all 0.3s ease;
+        }
+        .central-card:hover {
+            transform: scale(1.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        /* Styles for Matching Game */
+        .word-column { display: flex; flex-direction: column; gap: 1rem; }
+        .word-box { padding: 1rem 1.5rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 1.125rem; font-weight: 500; text-align: center; background-color: white; transition: all 0.2s ease-in-out; cursor: pointer; }
+        .word-box:not(.disabled):hover { border-color: #9ca3af; background-color: #f9fafb; }
+        .word-box.selected { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); }
+        .word-box.correct { border-color: #10b981; background-color: #ecfdf5; color: #065f46; }
+        .word-box.incorrect { animation: shake 0.5s; border-color: #ef4444; background-color: #fee2e2; }
+        .word-box.disabled { cursor: not-allowed; opacity: 0.7; }
+        
+        /* Styles for Connections Game */
+        .connections-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+        .connection-word { padding: 1.5rem 0; background-color: #e5e7eb; border-radius: 0.5rem; font-weight: bold; text-align: center; cursor: pointer; transition: all 0.2s ease; user-select: none; }
+        .connection-word.selected { background-color: #a5b4fc; color: #312e81; }
+        .connection-word.shake { animation: shake 0.5s; }
+        .solved-group { border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.75rem; text-align: center; color: white; }
+        .solved-group h3 { font-weight: 700; }
+
+        /* Styles for Crossword Game */
+        .crossword-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        @media (min-width: 768px) {
+            .crossword-container {
+                flex-direction: row;
+            }
+        }
+        .crossword-grid { flex: 2; }
+        .crossword-clues { flex: 1; }
+        
+        .crossword-container rect {
+            fill: #f3f4f6;
+            stroke: #9ca3af;
+            stroke-width: 1px;
+        }
+        .crossword-container rect.highlighted {
+            fill: #dbeafe;
+        }
+        .crossword-container text {
+            font-size: 1.5em;
+            font-family: inherit;
+        }
+        .crossword-container .clue.highlighted {
+            background-color: #dbeafe;
+            border-radius: 0.25rem;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useRef, useMemo } = React;
+
+        // --- HOMEPAGE COMPONENTS ---
+        const SectionCard = ({ title, gridArea, onClick, imageUrl }) => {
+            const cardRef = useRef(null);
+            useEffect(() => {
+                const card = cardRef.current;
+                if (!card) return;
+                const handleMouseMove = (e) => {
+                    const { left, top, width, height } = card.getBoundingClientRect();
+                    const x = e.clientX - left - width / 2;
+                    const y = e.clientY - top - height / 2;
+                    const rotateY = (x / width) * 20;
+                    const rotateX = -(y / height) * 20;
+                    card.style.setProperty('--rotate-y', `${rotateY}deg`);
+                    card.style.setProperty('--rotate-x', `${rotateX}deg`);
+                };
+                const handleMouseLeave = () => {
+                    card.style.setProperty('--rotate-y', '0deg');
+                    card.style.setProperty('--rotate-x', '0deg');
+                };
+                card.addEventListener('mousemove', handleMouseMove);
+                card.addEventListener('mouseleave', handleMouseLeave);
+                return () => {
+                    card.removeEventListener('mousemove', handleMouseMove);
+                    card.removeEventListener('mouseleave', handleMouseLeave);
+                };
+            }, []);
+            return (
+                <div ref={cardRef} className="card rounded-2xl flex items-center justify-center cursor-pointer shadow-lg bg-gray-700" style={{ gridArea, backgroundImage: `url(${imageUrl})` }} onClick={onClick}>
+                    <div className="absolute inset-0 bg-black/50 rounded-2xl"></div>
+                    <div className="card-content text-center relative">
+                        <h2 className="text-3xl font-bold text-white">{title}</h2>
+                    </div>
+                </div>
+            );
+        };
+        const HomePage = ({ navigate }) => {
+            const sections = [
+                { id: 'games', title: 'Games', area: 'games', imageUrl: 'https://placehold.co/600x400/34D399/FFFFFF?text=Games' },
+                { id: 'photos', title: 'Photos', area: 'photos', imageUrl: 'https://placehold.co/600x400/60A5FA/FFFFFF?text=Photos' },
+                { id: 'music', title: 'Music', area: 'music', imageUrl: 'https://placehold.co/600x400/F87171/FFFFFF?text=Music' },
+                { id: 'lucky', title: 'Feeling Lucky', area: 'lucky', imageUrl: 'https://placehold.co/600x400/FBBF24/FFFFFF?text=Lucky' }
+            ];
+            return (
+                <div className="flex items-center justify-center min-h-screen bg-gray-100">
+                    <div className="main-grid relative">
+                        {sections.map(section => ( <SectionCard key={section.id} title={section.title} gridArea={section.area} imageUrl={section.imageUrl} onClick={() => navigate(section.id)} /> ))}
+                        <div className="central-card absolute z-10 w-1/3 h-1/3 bg-rose-400 rounded-2xl flex items-center justify-center cursor-pointer shadow-2xl inset-0 m-auto" onClick={() => navigate('birthday')}>
+                             <div className="card-content text-center">
+                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">Happy Birthday!</h1>
+                                <p className="text-white/90 mt-2">A message for you</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+        
+        // --- PAGE CONTAINER & NAVIGATION ---
+        const PageContainer = ({ title, children, onBack }) => (
+            <div className="p-4 sm:p-8 min-h-screen bg-gray-100">
+                <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6">
+                    <button onClick={onBack} className="mb-4 bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                        &larr; Back
+                    </button>
+                    <h1 className="text-4xl font-bold text-gray-800 border-b pb-4 mb-6">{title}</h1>
+                    {children}
+                </div>
+            </div>
+        );
+
+        // --- MATCHING GAME COMPONENTS ---
+        const MatchingGame = () => {
+            const wordBank = useMemo(() => [ { id: 1, tr: 'Aşk', en: 'Love' }, { id: 2, tr: 'Aile', en: 'Family' }, { id: 3, tr: 'Çiçek', en: 'Flower' }, { id: 4, tr: 'Köpek', en: 'Dog' }, { id: 5, tr: 'Bahçe', en: 'Garden' }, { id: 6, tr: 'Daire', en: 'Condo' }, { id: 7, tr: 'Hırs', en: 'Ambition' }, { id: 8, tr: 'Cesur', en: 'Brave' }, { id: 9, tr: 'Nazik', en: 'Kind' }, { id: 10, tr: 'Güneş', en: 'Sun' }, { id: 11, tr: 'Arkadaş', en: 'Friend' }, { id: 12, tr: 'Mutlu', en: 'Happy' }, { id: 13, tr: 'Kedi', en: 'Cat' }, { id: 14, tr: 'Ev', en: 'Home' }, { id: 15, tr: 'Kitap', en: 'Book' }, { id: 16, tr: 'Su', en: 'Water' }, { id: 17, tr: 'Gökyüzü', en: 'Sky' }, { id: 18, tr: 'Yıldız', en: 'Star' }, { id: 19, tr: 'Rüya', en: 'Dream' }, { id: 20, tr: 'Umut', en: 'Hope' } ], []);
+            const [currentWords, setCurrentWords] = useState([]);
+            const [englishWords, setEnglishWords] = useState([]);
+            const [selectedTurkish, setSelectedTurkish] = useState(null);
+            const [matchedPairs, setMatchedPairs] = useState([]);
+            const [incorrectGuess, setIncorrectGuess] = useState(null);
+            const [gameSize, setGameSize] = useState(4);
+            const resetGame = useCallback(() => {
+                const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+                const newGameWords = shuffle(wordBank).slice(0, gameSize);
+                setCurrentWords(shuffle(newGameWords));
+                setEnglishWords(shuffle(newGameWords));
+                setSelectedTurkish(null);
+                setMatchedPairs([]);
+                setIncorrectGuess(null);
+            }, [wordBank, gameSize]);
+            useEffect(() => { resetGame(); }, [resetGame]);
+            const handleTurkishSelect = (word) => {
+                if (matchedPairs.includes(word.id)) return;
+                setSelectedTurkish(word);
+            };
+            const handleEnglishSelect = (word) => {
+                if (!selectedTurkish || matchedPairs.includes(word.id)) return;
+                if (selectedTurkish.id === word.id) {
+                    setMatchedPairs([...matchedPairs, word.id]);
+                    setSelectedTurkish(null);
+                } else {
+                    setIncorrectGuess(word.id);
+                    setTimeout(() => {
+                        setIncorrectGuess(null);
+                        setSelectedTurkish(null);
+                    }, 500);
+                }
+            };
+            const isGameWon = matchedPairs.length === gameSize;
+            return (
+                <div className="relative">
+                    {isGameWon && (
+                        <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center z-10 rounded-lg">
+                            <h2 className="text-3xl font-bold text-green-600 mb-4">You Win!</h2>
+                            <button onClick={resetGame} className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">Play Again</button>
+                        </div>
+                    )}
+                    <div className="flex justify-between">
+                        <div className="word-column">
+                            {currentWords.map(word => {
+                                const isSelected = selectedTurkish && selectedTurkish.id === word.id;
+                                const isMatched = matchedPairs.includes(word.id);
+                                return ( <div key={`tr-${word.id}`} className={`word-box ${isSelected ? 'selected' : ''} ${isMatched ? 'correct disabled' : ''}`} onClick={() => handleTurkishSelect(word)}>{word.tr}</div> );
+                            })}
+                        </div>
+                         <div className="word-column">
+                            {englishWords.map(word => {
+                                const isMatched = matchedPairs.includes(word.id);
+                                const isIncorrect = incorrectGuess === word.id;
+                                return ( <div key={`en-${word.id}`} className={`word-box ${isMatched ? 'correct disabled' : ''} ${isIncorrect ? 'incorrect' : ''}`} onClick={() => handleEnglishSelect(word)}>{word.en}</div> );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+        
+        // --- CONNECTIONS GAME COMPONENTS ---
+        const ConnectionsGame = () => {
+            const initialData = useMemo(() => [
+                { category: "STREET NAMES", words: ["Petman Ave", "Karaca Sk", "Yonge St", "Bagdat Cd"] },
+                { category: "FAMILY", words: ["Nehir", "Erdal", "Can", "Isik"] },
+                { category: "BAYINDIR", words: ["Dede", "Bahce", "Sicak", "Katmer"] },
+                { category: "CITY NAMES", words: ["Toronto", "Montreal", "Istanbul", "Izmir"] }
+            ], []);
+            const [gridWords, setGridWords] = useState([]);
+            const [selectedWords, setSelectedWords] = useState([]);
+            const [solvedGroups, setSolvedGroups] = useState([]);
+            const [mistakes, setMistakes] = useState(4);
+            const [isShaking, setIsShaking] = useState(false);
+            const [isGameOver, setIsGameOver] = useState(false);
+            const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+            const setupGame = useCallback(() => {
+                const allWords = initialData.flatMap(group => group.words);
+                setGridWords(shuffle(allWords));
+                setSelectedWords([]);
+                setSolvedGroups([]);
+                setMistakes(4);
+                setIsGameOver(false);
+            }, [initialData]);
+            useEffect(() => { setupGame(); }, [setupGame]);
+            const handleWordClick = (word) => {
+                if (isGameOver) return;
+                const newSelection = selectedWords.includes(word) ? selectedWords.filter(w => w !== word) : [...selectedWords, word];
+                if (newSelection.length <= 4) { setSelectedWords(newSelection); }
+            };
+            const handleSubmit = () => {
+                if (selectedWords.length !== 4) return;
+                const correctGroup = initialData.find(group => selectedWords.every(word => group.words.includes(word)) );
+                if (correctGroup) {
+                    setSolvedGroups([...solvedGroups, correctGroup]);
+                    setGridWords(gridWords.filter(word => !selectedWords.includes(word)));
+                    setSelectedWords([]);
+                } else {
+                    setMistakes(m => m - 1);
+                    setIsShaking(true);
+                    setTimeout(() => setIsShaking(false), 500);
+                }
+            };
+            useEffect(() => { if (mistakes === 0 || solvedGroups.length === 4) { setIsGameOver(true); } }, [mistakes, solvedGroups]);
+            const getCategoryColor = (index) => {
+                const colors = ['bg-yellow-400', 'bg-green-400', 'bg-blue-400', 'bg-purple-400'];
+                return colors[index % colors.length];
+            }
+            return (
+                <div>
+                    <div className="mb-4">
+                        {solvedGroups.map((group, index) => (
+                            <div key={group.category} className={`solved-group ${getCategoryColor(index)}`}>
+                                <h3 className="font-bold">{group.category}</h3>
+                                <p>{group.words.join(', ')}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <div className={`connections-grid mb-4 ${isShaking ? 'shake' : ''}`}>
+                        {gridWords.map(word => ( <div key={word} className={`connection-word ${selectedWords.includes(word) ? 'selected' : ''}`} onClick={() => handleWordClick(word)}>{word}</div> ))}
+                    </div>
+                    <div className="text-center mb-4">Mistakes remaining: {'● '.repeat(mistakes).trim()}</div>
+                    <div className="flex justify-center gap-4">
+                        <button onClick={() => setGridWords(shuffle(gridWords))} className="px-4 py-2 rounded-full font-semibold border-2 border-gray-700 hover:bg-gray-200">Shuffle</button>
+                        <button onClick={() => setSelectedWords([])} className="px-4 py-2 rounded-full font-semibold border-2 border-gray-700 hover:bg-gray-200">Deselect All</button>
+                        <button onClick={handleSubmit} disabled={selectedWords.length !== 4} className="px-4 py-2 rounded-full font-semibold bg-gray-800 text-white disabled:bg-gray-300">Submit</button>
+                    </div>
+                    {isGameOver && (
+                         <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center z-10 rounded-lg">
+                            <h2 className="text-3xl font-bold mb-4">{solvedGroups.length === 4 ? 'You Win!' : 'Game Over!'}</h2>
+                            <button onClick={setupGame} className="bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-900 transition-colors">Play Again</button>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // --- CROSSWORD GAME COMPONENTS ---
+        const CrosswordGame = () => {
+            const Crossword = window.ReactCrossword.Crossword;
+            const data = {
+                across: {
+                    1: { clue: 'Ağaçların yeşil kısmı (Leaf)', answer: 'YAPRAK', row: 0, col: 2 },
+                    4: { clue: 'Evcil hayvan, sadık dost (Dog)', answer: 'KOPEK', row: 2, col: 0 },
+                    6: { clue: 'Oksijen kaynağımız (Air)', answer: 'HAVA', row: 4, col: 1 },
+                    7: { clue: 'Bal yapan böcek (Bee)', answer: 'ARI', row: 6, col: 0 },
+                    8: { clue: 'Bitkilerin yetiştiği yer (Soil)', answer: 'TOPRAK', row: 6, col: 3 },
+                },
+                down: {
+                    2: { clue: 'Uçan, tüylü hayvan (Bird)', answer: 'KUS', row: 0, col: 4 },
+                    3: { clue: 'Yeryüzünün büyük su birikintisi (River)', answer: 'NEHIR', row: 1, col: 2 },
+                    5: { clue: 'Bahçelerin renkli süsü (Flower)', answer: 'CICEK', row: 2, col: 6 },
+                    6: { clue: 'Yaşam kaynağımız (Water)', answer: 'SU', row: 4, col: 1 },
+                },
+            };
+            return (
+                <div className="crossword-container">
+                    <div className="crossword-grid">
+                        <Crossword data={data} />
+                    </div>
+                </div>
+            );
+        };
+        
+        // --- MAIN PAGE COMPONENTS ---
+        const GamesMenuPage = ({ onBack, navigate }) => {
+            const games = [
+                { id: 'wordle', title: 'Wordle', imageUrl: 'https://placehold.co/400x400/10B981/FFFFFF?text=Wordle' },
+                { id: 'crossword', title: 'Crossword', imageUrl: 'https://placehold.co/400x400/3B82F6/FFFFFF?text=Crossword' },
+                { id: 'connections', title: 'Connections', imageUrl: 'https://placehold.co/400x400/F59E0B/FFFFFF?text=Connections' },
+                { id: 'matching-game', title: 'Matching Game', imageUrl: 'https://placehold.co/400x400/8B5CF6/FFFFFF?text=Matching' }
+            ];
+            return (
+                <PageContainer title="Games" onBack={onBack}>
+                    <div className="games-grid">
+                        {games.map(game => ( <SectionCard key={game.id} title={game.title} imageUrl={game.imageUrl} onClick={() => navigate(game.id)} /> ))}
+                    </div>
+                </PageContainer>
+            );
+        };
+        const WordlePage = ({ onBack }) => (
+            <PageContainer title="Wordle" onBack={onBack}>
+                <div className="bg-gray-50 p-6 rounded-lg shadow-inner text-center">
+                    <div className="space-y-6">
+                        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-8 rounded-xl border border-indigo-200">
+                            <h2 className="text-3xl font-bold text-indigo-800 mb-4">🎮 Wordle: Bean Edition</h2>
+                            <p className="text-lg text-gray-700 mb-6">A special personalized Wordle game with custom word banks!</p>
+                            <div className="grid md:grid-cols-3 gap-4 mb-6">
+                                <div className="bg-white p-4 rounded-lg border border-indigo-100">
+                                    <div className="text-2xl mb-2">💕</div>
+                                    <h3 className="font-semibold text-indigo-700">Bean Words</h3>
+                                    <p className="text-sm text-gray-600">Words about you!</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-lg border border-indigo-100">
+                                    <div className="text-2xl mb-2">👫</div>
+                                    <h3 className="font-semibold text-indigo-700">CJ & CJ</h3>
+                                    <p className="text-sm text-gray-600">Our relationship</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-lg border border-indigo-100">
+                                    <div className="text-2xl mb-2">🌍</div>
+                                    <h3 className="font-semibold text-indigo-700">Environment</h3>
+                                    <p className="text-sm text-gray-600">Nature & earth</p>
+                                </div>
+                            </div>
+                            <div className="space-y-3">
+                                <p className="text-sm text-gray-600">✨ Complete statistics tracking</p>
+                                <p className="text-sm text-gray-600">📊 Progress across browser sessions</p>
+                                <p className="text-sm text-gray-600">🎯 Category-specific performance</p>
+                            </div>
+                        </div>
+                        <a 
+                            href="WorldeForkImproved.html" 
+                            className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-bold py-4 px-8 rounded-full hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                        >
+                            🚀 Play Wordle: Bean Edition
+                        </a>
+                        <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <p className="text-sm text-yellow-800">
+                                <strong>📱 Mobile Friendly:</strong> Works perfectly on your phone too!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </PageContainer>
+        );
+        const MatchingGamePage = ({ onBack }) => ( <PageContainer title="Turkish Matching Game" onBack={onBack}> <div className="bg-gray-50 p-6 rounded-lg shadow-inner"><MatchingGame /></div> </PageContainer> );
+        const ConnectionsPage = ({ onBack }) => ( <PageContainer title="Connections" onBack={onBack}> <div className="bg-gray-50 p-6 rounded-lg shadow-inner relative"><ConnectionsGame /></div> </PageContainer> );
+        const CrosswordPage = ({ onBack }) => ( <PageContainer title="Turkish Crossword" onBack={onBack}> <div className="bg-gray-50 p-6 rounded-lg shadow-inner"><CrosswordGame /></div> </PageContainer> );
+        const PhotosPage = ({ onBack }) => ( <PageContainer title="Photos" onBack={onBack}><p>Photo gallery will be here.</p></PageContainer> );
+        const MusicPage = ({ onBack }) => ( <PageContainer title="Music Playlist" onBack={onBack}><p>Music player will be here.</p></PageContainer> );
+        const LuckyPage = ({ onBack }) => ( <PageContainer title="Feeling Lucky" onBack={onBack}><p>A random surprise will be here.</p></PageContainer> );
+        
+        const BirthdayPage = ({ onBack }) => (
+            <div className="min-h-screen bg-rose-800 text-white p-4 sm:p-8 font-poppins">
+                <button onClick={onBack} className="mb-4 bg-white/20 text-white font-semibold py-2 px-4 rounded-full hover:bg-white/30 transition-colors">
+                    &larr; Geri
+                </button>
+                <div className="max-w-3xl mx-auto text-center py-12">
+                    <h1 className="text-5xl md:text-7xl font-extrabold mb-12 tracking-tight">İyi ki Doğdun!</h1>
+                    <div className="text-left text-lg font-normal leading-relaxed space-y-6 bg-black/20 p-8 rounded-lg">
+                        <p>Canım Anam,</p>
+                        <p>İyi ki doğdun, nice mutlu yaşlara.</p>
+                        <p>Açıkçası nereden başlayacağımı bilemiyorum. Sen sadece annem değilsin—sen benim kahramanım, dayanak noktam ve tanıdığım en güçlü insansın. Hayatın karşımıza çıkardığı her fırtınada dik durdun, bizi korudun ve her zaman yarına dair umudumuzun olmasını sağladın.</p>
+                        <p>Dokuz yıl önce, babamla birlikte bildiğiniz her şeyi geride bırakma kararı aldınız. Evinizin rahatlığını, kurduğunuz hayatınızı feda ettiniz, hepsi benim ve Nehir için kurduğunuz hayaller, bizim daha iyi bir geleceğe, hayata, fırsatlara sahip olmamız için.</p>
+                        <p>Biliyorum ki yolculuk ikinizin hayal ettiğiniz gibi gelişmedi. Hayatın, Kanada'nın, ve elimizde olmayan güçlere ile birlikte hatalarımla, mücadelelerimle, ikinizi de hak etmediğiniz zamanlarda hayal kırıklığına uğrattığım anlarla işleri daha da zorlaştırdığımı biliyorum.</p>
+                        <p>Ama anam, hem sen, hem babam, yaptığım her hata sonrasında, yolumu kaybettiğim her anda, benden hiç vazgeçmediniz. Akademik olarak zorlandığımda, hayatta zorlandigimda, kendimi ve herkesi hayal kırıklığına uğrattığımı hissettiğimde—sen hep oradaydın. Bana olan inancın hiç sarsılmadı, ben kendime olan inancımı kaybettiğimde bile, beni daha ileri itmeye çalıştın. Bende göremediğim potansiyeli sen gördün ve senin sarsılmaz inancın kendimi yeniden inşa etmem için ihtiyacım olan temel oldu.</p>
+                        <p>Bu son yıl seni kimsenin katlanmaması gereken şekillerde sınadı. Babamı, hayatının aşkını, her şeyde ortağını kaybettik, bunun senin dünyasını nasıl sarstığını görüyorum. Yine de yasın içinde bile, onun olmadığı bu ilk doğum gününde bile, bizim için güç direği olmaya devam ediyorsun. Memleketteki işleri yönetiyorsun, buradaki işleri idare ediyorsun, bizim işlerimizle ilgileniyorsun ve bir şekilde ne olursa olsun hem kendini hem de ihtiyacımız olduğunda bizi ayağa kaldıracak enerjiyi buluyorsun.</p>
+                        <p>Taşıdığın yük çoğu insanı çökertirdi, ama sen öyle değilsin. Acıyı amaca, kalp kırıklığını bizim, çocukların için umuda dönüştürüyorsun.</p>
+                        <p>Anam, bu mektubu yazan genç adam senin sevgin, sabrın, benden vazgeçmeyi reddetmen sayesinde var. Bundan sonra başaracağım her güzel şey senin bana aşıladığın değerlerin, öğrettiğin dayanıklılığın, hak etmediğim zamanlarda bile gösterdiğin sevginin yansıması olacak.</p>
+                        <p>Bugün bir yaş daha büyürken, şunu bil ki artık her şeyi tek başına taşımak zorunda değilsin. Nehir ve ben yanındayız, her zaman. Senin desteğin, neşen ve ışığın olmak istiyoruz. Sen bana, bize her şeyini verdin; şimdi de biz de bunun karşılığını göstereceğiz. Senin kattığın disiplin, bakış açısıyla ilerleyeceğiz, nerede olursak olsun başarılı olacağız ve seni ve babamı gururlandıracağız.</p>
+                        <p>Sen olağanüstüsün, anneciğim. Gücün beni hayrete düşürüyor, kalbin bana ilham veriyor ve sevgin bende olan her güzel şeyi şekillendirdi. Umarım bu yeni yıl sana huzur dolu anlar, gülümseme nedenleri ve ölçüsüzce sevildiğinin bilgisini getirir. Tanıdığım en muhteşem kadına doğum günü kutlu olsun. Seni kelimelerin ifade edebileceğinden çok daha fazla seviyorum.</p>
+                        <p>Tüm sevgi ve minnettarlığımla,</p>
+                        <p>Oğlun</p>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // --- MAIN APP COMPONENT ---
+        const App = () => {
+            const [currentPage, setCurrentPage] = useState('home');
+            const navigate = (page) => { setCurrentPage(page); };
+            const renderPage = () => {
+                switch (currentPage) {
+                    case 'games': return <GamesMenuPage onBack={() => navigate('home')} navigate={navigate} />;
+                    case 'wordle': return <WordlePage onBack={() => navigate('games')} />;
+                    case 'matching-game': return <MatchingGamePage onBack={() => navigate('games')} />;
+                    case 'connections': return <ConnectionsPage onBack={() => navigate('games')} />;
+                    case 'crossword': return <CrosswordPage onBack={() => navigate('games')} />;
+                    case 'photos': return <PhotosPage onBack={() => navigate('home')} />;
+                    case 'music': return <MusicPage onBack={() => navigate('home')} />;
+                    case 'lucky': return <LuckyPage onBack={() => navigate('home')} />;
+                    case 'birthday': return <BirthdayPage onBack={() => navigate('home')} />;
+                    case 'home':
+                    default: return <HomePage navigate={navigate} />;
+                }
+            };
+            return <div className="App">{renderPage()}</div>;
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
