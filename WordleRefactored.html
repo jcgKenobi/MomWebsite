@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle - Mom Edition</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/wordle-styles.css">
+    
+    <!-- Game Scripts -->
+    <script src="enhanced-storage.js"></script>
+    <script src="js/game-constants.js"></script>
+    <script src="js/game-logic.js"></script>
+    <script src="js/storage-hook.js" type="text/babel"></script>
+    <script src="components/wordle-components.js" type="text/babel"></script>
+    <script src="components/wordle-game.js" type="text/babel"></script>
+    <script src="components/statistics.js" type="text/babel"></script>
+    <script src="components/app.js" type="text/babel"></script>
+</head>
+<body>
+    <!-- React App Root -->
+    <div id="root"></div>
+    
+    <!-- Initialize App -->
+    <script type="text/babel">
+        // Wait for DOM and all scripts to load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Small delay to ensure all Babel compilation is complete
+            setTimeout(() => {
+                initializeApp();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

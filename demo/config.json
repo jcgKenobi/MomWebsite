@@ -1,0 +1,60 @@
+{
+  "project": {
+    "name": "MomWebsite",
+    "version": "1.0.0",
+    "description": "A demonstration of Claude's file creation capabilities",
+    "author": "Claude AI Assistant",
+    "created": "2025-09-27"
+  },
+  "website": {
+    "title": "Mom's Website",
+    "theme": {
+      "primaryColor": "#667eea",
+      "secondaryColor": "#764ba2",
+      "fontFamily": "Segoe UI, Tahoma, Geneva, Verdana, sans-serif"
+    },
+    "features": {
+      "darkMode": true,
+      "analytics": true,
+      "lazyLoading": true,
+      "visitCounter": true
+    }
+  },
+  "analytics": {
+    "enabled": true,
+    "trackingId": "UA-XXXXXXXX-X",
+    "events": [
+      "page_view",
+      "button_click",
+      "form_submit",
+      "page_load_time"
+    ]
+  },
+  "performance": {
+    "lazyLoadImages": true,
+    "minifyAssets": false,
+    "cacheEnabled": true,
+    "compressionLevel": "medium"
+  },
+  "contact": {
+    "email": "contact@momwebsite.com",
+    "phone": "+1-555-0123",
+    "address": {
+      "street": "123 Main Street",
+      "city": "Hometown",
+      "state": "ST",
+      "zip": "12345"
+    }
+  },
+  "social": {
+    "facebook": "https://facebook.com/momwebsite",
+    "twitter": "https://twitter.com/momwebsite",
+    "instagram": "https://instagram.com/momwebsite"
+  },
+  "development": {
+    "environment": "development",
+    "debugMode": true,
+    "logLevel": "info",
+    "apiEndpoint": "https://api.momwebsite.com"
+  }
+}
