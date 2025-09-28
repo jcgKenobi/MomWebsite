@@ -227,7 +227,13 @@ const AnimationUtils = {
     }
 };
 
-// Export for use in other modules
+// Export for use in other modules and browser
+if (typeof window !== 'undefined') {
+    window.WordleGameLogic = WordleGameLogic;
+    window.KeyboardHandler = KeyboardHandler;
+    window.AnimationUtils = AnimationUtils;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         WordleGameLogic,

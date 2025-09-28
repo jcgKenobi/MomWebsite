@@ -115,7 +115,12 @@ const initializeApp = () => {
     }
 };
 
-// Export for testing or module use
+// Export for testing or module use and browser
+if (typeof window !== 'undefined') {
+    window.App = App;
+    window.initializeApp = initializeApp;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = App;
 }

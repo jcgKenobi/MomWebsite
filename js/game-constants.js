@@ -40,7 +40,14 @@ const SPECIAL_KEYS = {
     BACKSPACE: "⌫"
 };
 
-// Export for use in other modules
+// Export for use in other modules and browser
+if (typeof window !== 'undefined') {
+    window.WORD_BANKS = WORD_BANKS;
+    window.GAME_CONFIG = GAME_CONFIG;
+    window.CATEGORY_NAMES = CATEGORY_NAMES;
+    window.SPECIAL_KEYS = SPECIAL_KEYS;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         WORD_BANKS,

@@ -209,7 +209,17 @@ const Leaderboard = ({ history, navigate }) => {
     );
 };
 
-// Export components for use in main app
+// Export components for use in main app and browser
+if (typeof window !== 'undefined') {
+    window.MainMenu = MainMenu;
+    window.GameModeMenu = GameModeMenu;
+    window.WordleGrid = WordleGrid;
+    window.Keyboard = Keyboard;
+    window.EndOfRoundMenu = EndOfRoundMenu;
+    window.Leaderboard = Leaderboard;
+    window.Row = Row;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         MainMenu,

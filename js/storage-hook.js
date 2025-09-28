@@ -141,7 +141,12 @@ class BasicStorage {
     }
 }
 
-// Export for use in other modules
+// Export for use in other modules and browser
+if (typeof window !== 'undefined') {
+    window.useEnhancedStorage = useEnhancedStorage;
+    window.BasicStorage = BasicStorage;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         useEnhancedStorage,

@@ -103,15 +103,17 @@ To migrate from the old to new architecture:
 ## Files Created/Modified
 
 - ✅ `css/wordle-styles.css` - All styles
-- ✅ `js/game-constants.js` - Game data and config
-- ✅ `js/game-logic.js` - Core mechanics
-- ✅ `js/storage-hook.js` - Storage management
-- ✅ `components/app.js` - Main app
-- ✅ `components/wordle-components.js` - UI components
-- ✅ `components/wordle-game.js` - Game component
-- ✅ `components/statistics.js` - Stats display
-- ✅ `WordleRefactored.html` - New entry point
-- ✅ `WorldeForkImproved.html` - Fixed bugs
+- ✅ `js/game-constants.js` - Game data and config (with global exports)
+- ✅ `js/game-logic.js` - Core mechanics (with global exports)
+- ✅ `js/storage-hook.js` - Storage management (with global exports)
+- ✅ `components/app.js` - Main app (with global exports)
+- ✅ `components/wordle-components.js` - UI components (with global exports)
+- ✅ `components/wordle-game.js` - Game component (with global exports)
+- ✅ `components/statistics.js` - Stats display (with global exports)
+- ✅ `WordleRefactored.html` - Development version with separate files
+- ✅ `WordleProduction.html` - Production version (single bundled file)
+- ✅ `index.html` - Updated to point to WordleProduction.html
+- ❌ `WorldeForkImproved.html` - DELETED (had too many issues)
 
 ## Testing Checklist
 

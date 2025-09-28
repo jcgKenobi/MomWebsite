@@ -35,12 +35,47 @@
     
     <!-- Initialize App -->
     <script type="text/babel">
-        // Wait for DOM and all scripts to load
-        document.addEventListener('DOMContentLoaded', () => {
-            // Small delay to ensure all Babel compilation is complete
-            setTimeout(() => {
-                initializeApp();
-            }, 100);
+        // Wait for all scripts to load and compile
+        window.addEventListener('load', () => {
+            // Ensure all components are available
+            const checkDependencies = () => {
+                const required = [
+                    'WORD_BANKS', 'GAME_CONFIG', 'CATEGORY_NAMES', 'SPECIAL_KEYS',
+                    'WordleGameLogic', 'KeyboardHandler',
+                    'useEnhancedStorage', 'BasicStorage',
+                    'MainMenu', 'GameModeMenu', 'WordleGrid', 'Keyboard', 
+                    'EndOfRoundMenu', 'Leaderboard', 'WordleGame', 'Statistics', 'App'
+                ];
+                
+                for (const dep of required) {
+                    if (typeof window[dep] === 'undefined') {
+                        console.warn(`Waiting for ${dep} to load...`);
+                        return false;
+                    }
+                }
+                return true;
+            };
+            
+            // Try to initialize with retries
+            let attempts = 0;
+            const tryInit = () => {
+                attempts++;
+                if (checkDependencies()) {
+                    console.log('All dependencies loaded, initializing app...');
+                    initializeApp();
+                } else if (attempts < 20) {
+                    setTimeout(tryInit, 100);
+                } else {
+                    console.error('Failed to load all dependencies after 2 seconds');
+                    // Try to initialize anyway
+                    if (typeof initializeApp === 'function') {
+                        initializeApp();
+                    }
+                }
+            };
+            
+            // Start initialization attempt
+            setTimeout(tryInit, 100);
         });
     </script>
 </body>

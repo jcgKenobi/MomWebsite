@@ -202,7 +202,14 @@ const RecentGames = ({ games }) => {
     );
 };
 
-// Export for use in main app
+// Export for use in main app and browser
+if (typeof window !== 'undefined') {
+    window.Statistics = Statistics;
+    window.GuessDistribution = GuessDistribution;
+    window.CategoryPerformance = CategoryPerformance;
+    window.RecentGames = RecentGames;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = Statistics;
 }

@@ -133,7 +133,11 @@ const WordleGame = ({ solution, onGameOver, onNextWord, onBackToMenu }) => {
     );
 };
 
-// Export for use in main app
+// Export for use in main app and browser
+if (typeof window !== 'undefined') {
+    window.WordleGame = WordleGame;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = WordleGame;
 }
