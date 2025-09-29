@@ -1,0 +1,92 @@
+{
+  "name": "moms-game-center",
+  "version": "2.0.0",
+  "description": "A special birthday website with personalized games for Mom",
+  "main": "index-unified.html",
+  "keywords": [
+    "games",
+    "wordle",
+    "crossword",
+    "matching",
+    "connections",
+    "birthday"
+  ],
+  "author": "John",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/[username]/MomWebsite"
+  },
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx serve .",
+    "dev": "npx live-server --port=8000",
+    "test": "echo \"No tests configured yet\"",
+    "backup": "git add . && git commit -m 'Backup before changes' && git push"
+  },
+  "structure": {
+    "src": "Source code directory",
+    "src/core": "Core framework (App, Router, GameRegistry)",
+    "src/games": "Individual game modules",
+    "src/shared": "Shared components, styles, and utilities",
+    "backup": "Backup files from previous versions"
+  },
+  "pages": {
+    "new-architecture": "index-unified.html",
+    "original": "index.html",
+    "wordle-production": "WordleProduction.html",
+    "wordle-refactored": "WordleRefactored.html"
+  },
+  "technologies": {
+    "frontend": [
+      "React 18",
+      "Tailwind CSS",
+      "Babel (JSX compilation)",
+      "Vanilla JavaScript (ES6+)"
+    ],
+    "architecture": [
+      "Plugin-based game system",
+      "Client-side routing",
+      "Component-based UI",
+      "Design tokens (CSS variables)"
+    ],
+    "storage": [
+      "localStorage",
+      "JSON serialization"
+    ]
+  },
+  "features": {
+    "games": [
+      "Wordle (3 modes: English, Turkish, Nature)",
+      "Word Matching (Turkish-English)",
+      "Connections (Group finding)",
+      "Crossword (Turkish)"
+    ],
+    "system": [
+      "Game statistics tracking",
+      "Progress persistence",
+      "Dark mode support",
+      "Mobile responsive",
+      "Analytics tracking"
+    ]
+  },
+  "browser-support": {
+    "chrome": "90+",
+    "firefox": "88+",
+    "safari": "14+",
+    "edge": "90+",
+    "mobile": "iOS 14+, Android 10+"
+  },
+  "deployment": {
+    "github-pages": {
+      "branch": "main",
+      "folder": "root",
+      "url": "https://[username].github.io/MomWebsite/"
+    }
+  },
+  "notes": {
+    "development": "Open index-unified.html in browser for development",
+    "production": "All files can be served statically, no build process required",
+    "migration": "See ARCHITECTURE_GUIDE.md for migration instructions"
+  }
+}

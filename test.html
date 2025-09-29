@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Test Suite</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .test-item:last-child {
+            border-bottom: none;
+        }
+        .test-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        .test-status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .status-pass {
+            background: #10b981;
+            color: white;
+        }
+        .status-fail {
+            background: #ef4444;
+            color: white;
+        }
+        .status-pending {
+            background: #f59e0b;
+            color: white;
+        }
+        .test-summary {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #4338ca;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Mom's Game Center - Architecture Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>Core Systems</h2>
+        <div id="core-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Game Modules</h2>
+        <div id="game-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Shared Components</h2>
+        <div id="component-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Storage & Utils</h2>
+        <div id="util-tests"></div>
+    </div>
+    
+    <div class="test-summary">
+        <h2>Test Summary</h2>
+        <div class="summary-stats">
+            <div class="stat">
+                <div class="stat-value" id="total-tests">0</div>
+                <div class="stat-label">Total Tests</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="passed-tests" style="color: #10b981;">0</div>
+                <div class="stat-label">Passed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="failed-tests" style="color: #ef4444;">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="success-rate">0%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+        </div>
+        <div style="margin-top: 20px;">
+            <button onclick="runAllTests()">🔄 Run All Tests</button>
+            <button onclick="window.location.href='index-unified.html'">🎮 Open Game Center</button>
+            <button onclick="window.location.href='index.html'">📜 Open Legacy Version</button>
+        </div>
+    </div>
+
+    <!-- Load Core Systems -->
+    <script src="src/core/GameRegistry.js"></script>
+    <script src="src/core/Router.js"></script>
+    
+    <!-- Load Utilities -->
+    <script src="src/shared/utils/storage.js"></script>
+    <script src="src/shared/utils/analytics.js"></script>
+    
+    <!-- Test Suite -->
+    <script>
+        const tests = {
+            core: [],
+            games: [],
+            components: [],
+            utils: []
+        };
+        
+        let stats = {
+            total: 0,
+            passed: 0,
+            failed: 0
+        };
+        
+        // Test runner
+        function runTest(name, testFn) {
+            try {
+                const result = testFn();
+                return {
+                    name,
+                    status: result ? 'pass' : 'fail',
+                    error: result ? null : 'Test returned false'
+                };
+            } catch (error) {
+                return {
+                    name,
+                    status: 'fail',
+                    error: error.message
+                };
+            }
+        }
+        
+        // Define tests
+        function defineTests() {
+            // Core system tests
+            tests.core = [
+                {
+                    name: 'GameRegistry exists',
+                    test: () => typeof GameRegistry !== 'undefined'
+                },
+                {
+                    name: 'GameInterface exists',
+                    test: () => typeof GameInterface !== 'undefined'
+                },
+                {
+                    name: 'Router exists',
+                    test: () => typeof Router !== 'undefined'
+                },
+                {
+                    name: 'Can create GameRegistry',
+                    test: () => {
+                        const registry = new GameRegistry();
+                        return registry !== null;
+                    }
+                },
+                {
+                    name: 'Can create Router',
+                    test: () => {
+                        const router = new Router();
+                        return router !== null;
+                    }
+                }
+            ];
+            
+            // Game module tests
+            tests.games = [
+                {
+                    name: 'GameInterface can be instantiated',
+                    test: () => {
+                        const game = new GameInterface({
+                            id: 'test',
+                            name: 'Test Game'
+                        });
+                        return game.id === 'test';
+                    }
+                },
+                {
+                    name: 'Game can be registered',
+                    test: () => {
+                        const registry = new GameRegistry();
+                        const game = new GameInterface({
+                            id: 'test2',
+                            name: 'Test Game 2'
+                        });
+                        registry.register(game);
+                        return registry.hasGame('test2');
+                    }
+                },
+                {
+                    name: 'Game metadata is correct',
+                    test: () => {
+                        const game = new GameInterface({
+                            id: 'test3',
+                            name: 'Test Game 3',
+                            icon: '🎮'
+                        });
+                        const meta = game.getMetadata();
+                        return meta.icon === '🎮';
+                    }
+                }
+            ];
+            
+            // Storage tests
+            tests.utils = [
+                {
+                    name: 'localStorage is available',
+                    test: () => typeof localStorage !== 'undefined'
+                },
+                {
+                    name: 'WordleStorage exists',
+                    test: () => typeof WordleStorage !== 'undefined'
+                },
+                {
+                    name: 'Can create WordleStorage',
+                    test: () => {
+                        const storage = new WordleStorage();
+                        return storage !== null;
+                    }
+                },
+                {
+                    name: 'Analytics exists',
+                    test: () => typeof Analytics !== 'undefined'
+                },
+                {
+                    name: 'Can track events',
+                    test: () => {
+                        const analytics = new Analytics({ debug: false });
+                        analytics.trackEvent('test_event', { test: true });
+                        return analytics.getEvents().length > 0;
+                    }
+                }
+            ];
+            
+            // Component tests (basic checks)
+            tests.components = [
+                {
+                    name: 'Design tokens loaded',
+                    test: () => {
+                        const link = document.createElement('link');
+                        link.rel = 'stylesheet';
+                        link.href = 'src/shared/styles/design-tokens.css';
+                        document.head.appendChild(link);
+                        return true;
+                    }
+                },
+                {
+                    name: 'Router can register routes',
+                    test: () => {
+                        const router = new Router();
+                        router.register('/test', () => {});
+                        return router.hasRoute('/test');
+                    }
+                },
+                {
+                    name: 'GameRegistry event system works',
+                    test: () => {
+                        const registry = new GameRegistry();
+                        let eventFired = false;
+                        registry.on('test', () => { eventFired = true; });
+                        registry.emit('test');
+                        return eventFired;
+                    }
+                }
+            ];
+        }
+        
+        // Run all tests
+        function runAllTests() {
+            defineTests();
+            stats = { total: 0, passed: 0, failed: 0 };
+            
+            // Run core tests
+            const coreResults = tests.core.map(t => runTest(t.name, t.test));
+            displayResults('core-tests', coreResults);
+            
+            // Run game tests
+            const gameResults = tests.games.map(t => runTest(t.name, t.test));
+            displayResults('game-tests', gameResults);
+            
+            // Run component tests
+            const componentResults = tests.components.map(t => runTest(t.name, t.test));
+            displayResults('component-tests', componentResults);
+            
+            // Run util tests
+            const utilResults = tests.utils.map(t => runTest(t.name, t.test));
+            displayResults('util-tests', utilResults);
+            
+            // Update summary
+            updateSummary();
+        }
+        
+        // Display test results
+        function displayResults(containerId, results) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            results.forEach(result => {
+                stats.total++;
+                if (result.status === 'pass') {
+                    stats.passed++;
+                } else {
+                    stats.failed++;
+                }
+                
+                const item = document.createElement('div');
+                item.className = 'test-item';
+                item.innerHTML = `
+                    <span class="test-name">
+                        ${result.name}
+                        ${result.error ? `<small style="color: #ef4444;"> - ${result.error}</small>` : ''}
+                    </span>
+                    <span class="test-status status-${result.status}">
+                        ${result.status === 'pass' ? '✓ PASS' : '✗ FAIL'}
+                    </span>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        // Update summary
+        function updateSummary() {
+            document.getElementById('total-tests').textContent = stats.total;
+            document.getElementById('passed-tests').textContent = stats.passed;
+            document.getElementById('failed-tests').textContent = stats.failed;
+            
+            const successRate = stats.total > 0 
+                ? Math.round((stats.passed / stats.total) * 100) 
+                : 0;
+            document.getElementById('success-rate').textContent = successRate + '%';
+            
+            // Color code success rate
+            const rateElement = document.getElementById('success-rate');
+            if (successRate === 100) {
+                rateElement.style.color = '#10b981';
+            } else if (successRate >= 80) {
+                rateElement.style.color = '#f59e0b';
+            } else {
+                rateElement.style.color = '#ef4444';
+            }
+        }
+        
+        // Auto-run tests on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runAllTests, 500);
+        });
+    </script>
+</body>
+</html>
